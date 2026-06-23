@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>景点名称 - 伴学手册</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ============ 主题色 - 根据景点类型选择 ============ */
+    /*
+     【童趣通用】适用于各类景点，活泼明快
+    --primary:#FF6B9D;      --primary-rgb:255,107,157;
+    --secondary:#4ECDC4;    --secondary-rgb:78,205,196;
+    --accent:#FFD93D;       --accent-rgb:255,217,61;
+    背景: #FFE5EC → #E8F8F5 → #FFF9E6
+
+     【中国古建筑】故宫、天坛、颐和园等 - 皇家庄严华贵
+    --primary:#D32F2F;      --primary-rgb:211,47,47;
+    --secondary:#FFC107;    --secondary-rgb:255,193,7;
+    --accent:#FFD54F;       --accent-rgb:255,213,79;
+    背景: #FFEBEE → #FFF8E1 → #FFF3E0
+
+     【长城类】古朴坚毅
+    --primary:#78909C;      --primary-rgb:120,144,156;
+    --secondary:#D4A574;    --secondary-rgb:212,165,116;
+    --accent:#546E7A;       --accent-rgb:84,110,122;
+    背景: #ECEFF1 → #EFEBE9 → #ECEFF1
+
+     【自然山水】九寨沟、张家界等 - 清新自然
+    --primary:#66BB6A;      --primary-rgb:102,187,106;
+    --secondary:#42A5F5;     --secondary-rgb:66,165,245;
+    --accent:#26A69A;       --accent-rgb:38,166,154;
+    背景: #E8F5E9 → #E3F2FD → #E0F2F1
+
+     【文化遗址】兵马俑、敦煌等 - 古老神秘
+    --primary:#D4A574;      --primary-rgb:212,165,116;
+    --secondary:#78909C;    --secondary-rgb:120,144,156;
+    --accent:#8D6E63;       --accent-rgb:141,110,99;
+    背景: #EFEBE9 → #ECEFF1 → #EFEBE9
+
+     【宗教寺庙】神圣宁静禅意
+    --primary:#FFC107;      --primary-rgb:255,193,7;
+    --secondary:#1A237E;    --secondary-rgb:26,35,126;
+    --accent:#8D6E63;       --accent-rgb:141,110,99;
+    背景: #FFF8E1 → #E8EAF6 → #EFEBE9
+
+     【水域海滨】海边、湖畔等 - 清澈开阔
+    --primary:#0288D0;      --primary-rgb:2,136,208;
+    --secondary:#4FC3F7;     --secondary-rgb:79,195,247;
+    --accent:#81C784;       --accent-rgb:129,199,132;
+    背景: #E1F5FE → #E1F5FE → #E8F5E9
+
+     【园林庭院】苏州园林等 - 雅致诗意
+    --primary:#66BB6A;      --primary-rgb:102,187,106;
+    --secondary:#D4A574;     --secondary-rgb:212,165,116;
+    --accent:#B2DFDB;       --accent-rgb:178,223,219;
+    背景: #E8F5E9 → #EFEBE9 → #E0F2F1
+    */
+
+    /* ============ 默认配色（童趣通用） ============ */
+    --primary:#FF6B9D;
+    --primary-rgb:255,107,157;
+    --secondary:#4ECDC4;
+    --secondary-rgb:78,205,196;
+    --accent:#FFD93D;
+    --accent-rgb:255,217,61;
+    --bg-light:#FFF5F7;
+    --bg-light-rgb:255,245,247;
+    --bg-dark:#2D3436;
+    --bg-dark-rgb:45,52,54;
+
+    /* ============ 童趣圆润字体 ============ */
+    --font-round:"Quicksand","YouYuan","幼圆","Noto Sans SC",sans-serif;
+    --font-cute:"YouYuan","幼圆","Quicksand","Noto Sans SC",sans-serif;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    /* 背景渐变：主色浅色 → 辅色浅色 → 强调色浅色 */
+    background:linear-gradient(135deg, var(--bg-light) 0%, #E8F8F5 50%, #FFF9E6 100%);
+    color:var(--bg-dark);
+    font-family:var(--font-round);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility
+  }
+
+  /* ============ 简化的背景（颜色需与主题色同步） ============ */
+  .bg-pattern{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    z-index:0;
+    opacity:0.15;
+    /* 背景点颜色需与选择的配色方案同步更新 */
+    background-image:
+      radial-gradient(circle at 20% 30%, var(--primary) 2px, transparent 2px),
+      radial-gradient(circle at 80% 70%, var(--secondary) 2px, transparent 2px),
+      radial-gradient(circle at 50% 50%, var(--accent) 2px, transparent 2px);
+    background-size: 80px 80px, 100px 100px, 60px 60px;
+    animation: bgFloat 20s linear infinite
+  }
+
+  @keyframes bgFloat{
+    0%{background-position: 0 0, 0 0, 0 0;}
+    100%{background-position: 80px 80px, 100px 100px, 60px 60px;}
+  }
+
+  /* ============ Deck 容器 + 翻页 ============ */
+  #deck{
+    position:fixed;
+    inset:0;
+    width:10000vw;
+    height:100vh;
+    display:flex;
+    flex-wrap:nowrap;
+    transition:transform .8s cubic-bezier(.77,0,.175,1);
+    z-index:10;
+    will-change:transform
+  }
+
+  .slide{
+    width:100vw;
+    height:100vh;
+    flex:0 0 100vw;
+    position:relative;
+    padding:7vh 7vw 9vh 7vw;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    justify-content:space-between;
+  }
+
+  /* ============ 导航点 ============ */
+  #nav{
+    position:fixed;
+    left:50%;
+    bottom:3vh;
+    transform:translateX(-50%);
+    z-index:30;
+    display:flex;
+    gap:12px;
+    padding:12px 18px;
+    border-radius:999px;
+    background:rgba(255,255,255,.8);
+    backdrop-filter:blur(10px);
+    box-shadow:0 4px 20px rgba(0,0,0,.1)
+  }
+
+  #nav .dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:rgba(255,107,157,.3);
+    cursor:pointer;
+    transition:all .3s ease;
+    border:0;
+    padding:0
+  }
+
+  #nav .dot:hover{
+    background:rgba(255,107,157,.6);
+    transform:scale(1.2)
+  }
+
+  #nav .dot.active{
+    background:rgba(255,107,157,.95);
+    width:28px;
+    border-radius:999px
+  }
+
+  /* ============ 字体规则（增大尺寸） ============ */
+  .display{
+    font-family:var(--font-cute);
+    font-weight:900;
+    font-size:10vw;
+    line-height:.95;
+    letter-spacing:.02em
+  }
+
+  .h1{
+    font-family:var(--font-cute);
+    font-weight:700;
+    font-size:5.5vw;
+    line-height:1.1;
+    letter-spacing:.01em
+  }
+
+  .h2{
+    font-family:var(--font-cute);
+    font-weight:600;
+    font-size:3.8vw;
+    line-height:1.2;
+    letter-spacing:0
+  }
+
+  .h3{
+    font-family:var(--font-cute);
+    font-weight:600;
+    font-size:2.8vw;
+    line-height:1.3
+  }
+
+  .body{
+    font-family:var(--font-round);
+    font-weight:400;
+    font-size:2vw;
+    line-height:1.9
+  }
+
+  .lead{
+    font-family:var(--font-round);
+    font-weight:500;
+    font-size:2.4vw;
+    line-height:1.6
+  }
+
+  .meta{
+    font-family:var(--font-round);
+    font-size:1.6vw;
+    letter-spacing:.05em;
+    opacity:.75;
+    font-weight:500
+  }
+
+  /* ============ 卡片样式 ============ */
+  .card{
+    background:#fff;
+    border-radius:28px;
+    padding:5vh 5vw;
+    box-shadow:0 8px 32px rgba(0,0,0,.08);
+    border:3px dashed rgba(255,107,157,.3)
+  }
+
+  .task-card{
+    background:linear-gradient(135deg, #FFF9E6 0%, #FFF4D6 100%);
+    border-radius:24px;
+    padding:5vh 5vw;
+    border:3px dashed #FFD93D;
+    margin-top:5vh
+  }
+
+  .tip-card{
+    background:linear-gradient(135deg, #E8F8F5 0%, #D4F1F0 100%);
+    border-radius:24px;
+    padding:5vh 5vw;
+    border:3px dashed #4ECDC4;
+    margin-top:5vh
+  }
+
+  /* ============ 大号emoji装饰 ============ */
+  .emoji-huge{
+    font-size:8vw;
+    line-height:1;
+    animation:emojiBounce 3s ease-in-out infinite
+  }
+
+  .emoji-big{
+    font-size:5vw;
+    line-height:1
+  }
+
+  @keyframes emojiBounce{
+    0%,100%{transform:translateY(0) rotate(0deg)}
+    50%{transform:translateY(-10px) rotate(3deg)}
+  }
+
+  /* ============ 彩虹装饰 ============ */
+  .rainbow-text{
+    background:linear-gradient(90deg, #FF6B9D, #FFD93D, #4ECDC4, #6BCB77, #FF6B9D);
+    background-size:200% auto;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    animation:rainbow 3s linear infinite
+  }
+
+  @keyframes rainbow{
+    0%{background-position:0% center}
+    100%{background-position:200% center}
+  }
+
+  /* ============ 布局工具 ============ */
+  .col{display:flex;flex-direction:column;gap:4vh}
+  .row{display:flex;align-items:center;gap:4vw}
+  .center{align-items:center;justify-content:center;text-align:center}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:5vw;align-items:center}
+  .split-6-4{display:grid;grid-template-columns:6fr 4fr;gap:5vw;align-items:center}
+  .fill{flex:1}
+
+  /* ============ 顶部/底部栏 ============ */
+  .chrome{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-family:var(--font-round);
+    font-size:1.6vw;
+    opacity:.85;
+    font-weight:600
+  }
+
+  .foot{
+    margin-top:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-family:var(--font-round);
+    font-size:1.5vw;
+    opacity:.7;
+    font-weight:500
+  }
+
+  /* ============ 高亮标签 ============ */
+  .highlight{
+    background:#FFD93D;
+    padding:6px 18px;
+    border-radius:24px;
+    font-weight:700;
+    font-size:1.8vw
+  }
+
+  .badge{
+    display:inline-block;
+    padding:12px 24px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:1.6vw;
+    border:3px dashed
+  }
+
+  .badge-pink{
+    background:#FFE5EC;
+    border-color:#FF6B9D;
+    color:#FF6B9D
+  }
+
+  .badge-mint{
+    background:#E8F8F5;
+    border-color:#4ECDC4;
+    color:#4ECDC4
+  }
+
+  .badge-yellow{
+    background:#FFF9E6;
+    border-color:#FFD93D;
+    color:#E6A800
+  }
+
+  /* ============ 色彩区块（替代图片） ============ */
+  .color-block{
+    width:100%;
+    aspect-ratio:16/10;
+    border-radius:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:2vh;
+    position:relative;
+    overflow:hidden;
+    border:4px dashed rgba(255,255,255,.5)
+  }
+
+  /* ============ 封面图片容器 ============ */
+  .cover-image-container{
+    width:100%;
+    max-height:40vh;
+    overflow:hidden;
+    border-radius:24px;
+    margin-bottom:4vh;
+    border:4px solid rgba(255,107,157,.2)
+  }
+
+  .cover-image-container img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center 30%;
+    display:block
+  }
+
+  .color-block-gradient{
+    background:linear-gradient(135deg, #FF6B9D 0%, #FFD93D 50%, #4ECDC4 100%)
+  }
+
+  .color-block-mint{
+    background:linear-gradient(135deg, #4ECDC4 0%, #6BCB77 100%)
+  }
+
+  .color-block-pink{
+    background:linear-gradient(135deg, #FF6B9D 0%, #FF8E53 100%)
+  }
+
+  .color-block-yellow{
+    background:linear-gradient(135deg, #FFD93D 0%, #FFA500 100%)
+  }
+
+  .color-block-content{
+    position:relative;
+    z-index:1;
+    text-align:center;
+    color:#fff
+  }
+
+  /* ============ 证书页面print/screenshot友好模式 ============ */
+  @media print {
+    .chrome, .foot, #nav {
+      display: none !important;
+    }
+    .slide {
+      padding: 2vh !important;
+    }
+    .bg-pattern {
+      display: none !important;
+    }
+    /* 只显示证书页 */
+    #deck {
+      width: 100vw !important;
+      transform: none !important;
+    }
+    .slide:not(.certificate-mode) {
+      display: none !important;
+    }
+    .slide.certificate-mode {
+      width: 100vw !important;
+      page-break-after: always;
+    }
+  }
+
+  /* 截图友好模式 - 证书页隐藏功能性UI */
+  .slide.certificate-mode .chrome,
+  .slide.certificate-mode .foot {
+    display: none !important;
+  }
+</style>
+</head>
+<body>
+<div class="bg-pattern"></div>
+
+<div id="deck">
+
+<!-- 封面页 -->
+<section class="slide center">
+  <!-- 封面图片（可选，使用<img>标签确保图片完整显示不被裁切）
+       使用 cover-image-container 类，图片会完整显示
+       去掉注释并替换 [封面图片URL] 为实际图片链接 -->
+  <!-- <div class="cover-image-container">
+    <img src="[封面图片URL]" alt="景点封面">
+  </div> -->
+
+  <div class="emoji-huge" style="font-size:10vw; margin-bottom:3vh;">🏞️🦌💧</div>
+  <h1 class="display rainbow-text">景点名称探险记</h1>
+  <div class="h2" style="margin-top:2vh; color:#FF6B9D;">发现[景点特色]的魔法秘密 🌈</div>
+
+  <div style="margin-top:6vh; display:grid; grid-template-columns:repeat(3,1fr); gap:4vw; max-width:80%;">
+    <div class="center col">
+      <div class="emoji-big">🌟</div>
+      <div class="body" style="font-size:1.5vw;">[秘密1标题]</div>
+    </div>
+    <div class="center col">
+      <div class="emoji-big">🌟</div>
+      <div class="body" style="font-size:1.5vw;">[秘密2标题]</div>
+    </div>
+    <div class="center col">
+      <div class="emoji-big">🌟</div>
+      <div class="body" style="font-size:1.5vw;">[秘密3标题]</div>
+    </div>
+    <div class="center col">
+      <div class="emoji-big">🌟</div>
+      <div class="body" style="font-size:1.5vw;">[秘密4标题]</div>
+    </div>
+    <div class="center col">
+      <div class="emoji-big">🌟</div>
+      <div class="body" style="font-size:1.5vw;">[秘密5标题]</div>
+    </div>
+    <div class="center col">
+      <div class="emoji-big">🎯</div>
+      <div class="body" style="font-size:1.5vw;">[数量]个秘密</div>
+    </div>
+  </div>
+
+  <div style="margin-top:auto;">
+    <span class="badge badge-pink">🌲 [年龄]岁小探险家</span>
+    <span class="badge badge-mint">⏰ [时长]</span>
+  </div>
+</section>
+
+<!-- 任务介绍页 -->
+<section class="slide">
+  <div class="chrome">
+    <div class="left">📖 探险开始</div>
+    <div class="right">02 / 09</div>
+  </div>
+
+  <div class="fill center col" style="padding-top:6vh;">
+    <div class="emoji-huge">🧙‍♀️✨</div>
+    <h2 class="h1" style="margin:3vh 0;">你是一名[角色名称]！</h2>
+
+    <div class="lead" style="max-width:85%; line-height:1.9; margin-bottom:4vh;">
+      [故事导入内容]...
+    </div>
+
+    <div class="card" style="max-width:85%; background:#FFF9E6; border-color:#FFD93D;">
+      <div class="body" style="font-size:2vw;">
+        [故事核心内容]，变成了<span class="highlight">[数量]个[特色元素]</span>，每个都有神奇的魔法！
+      </div>
+      <div style="margin-top:2vh; font-size:2.5em; text-align:center;">✨💎🌟✨💎🌟✨</div>
+    </div>
+
+    <div class="body" style="margin-top:5vh; font-size:2vw;">
+      今天，你要找出<span class="highlight" style="background:#FF6B9D; color:#fff;">[数量]个魔法秘密</span>！准备好了吗？出发！🚀
+    </div>
+  </div>
+
+  <div class="foot">
+    <div>[景点名称]小探险家手册</div>
+    <div>02 / 09</div>
+  </div>
+</section>
+
+<!-- 发现一模板 -->
+<section class="slide">
+  <div class="chrome">
+    <div class="left">🌟 秘密一</div>
+    <div class="right">03 / 10</div>
+  </div>
+
+  <div class="split-6-4" style="padding-top:5vh; align-items:start;">
+    <div class="col">
+      <div class="meta" style="font-size:1.4vw; letter-spacing:.2em;">[景点英文名]</div>
+      <div class="emoji-huge" style="font-size:6vw;">[对应emoji]</div>
+      <h2 class="h1" style="margin:2vh 0;">[秘密一标题]</h2>
+      <div class="meta">[具体地点] · [简短描述]</div>
+
+      <div class="body" style="margin-top:4vh; font-size:2vw; line-height:1.8;">
+        <p style="margin-bottom:2vh;">💡 <strong>小知识：</strong>[孩子会看到的景象描述]</p>
+        <p>🎨 [更多有趣的知识点]</p>
+      </div>
+
+      <div class="tip-card">
+        <div class="h3" style="font-size:1.8vw;">为什么[现象名称]？</div>
+        <div class="body" style="margin-top:1vh;">[简单易懂的原因解释]</div>
+      </div>
+
+      <div class="task-card">
+        <div class="meta" style="font-size:1.4vw;">🎯 探险任务一：[任务名称]</div>
+        <div class="body" style="font-size:1.8vw;">[具体任务描述]</div>
+        <div class="meta" style="margin-top:1vh;">💡 小提示：[成功标志或提示]</div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="color-block color-block-gradient">
+        <div class="color-block-content">
+          <div class="emoji-huge" style="font-size:8vw;">[emoji]</div>
+          <div class="h2" style="color:#fff; font-size:3vw;">[地点名称]</div>
+          <div class="body" style="color:rgba(255,255,255,.9);">[简短描述]</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div>[景点名称]小探险家手册</div>
+    <div>03 / 09</div>
+  </div>
+</section>
+
+<!-- 更多发现页（复制秘密一模板，修改内容） -->
+<!-- 秘密二、三、四、五 -->
+
+<!-- 家长提示页 -->
+<section class="slide">
+  <div class="chrome">
+    <div class="left">👨‍👩‍👧 家长小帮手</div>
+    <div class="right">08 / 09</div>
+  </div>
+
+  <div class="fill col" style="padding-top:4vh; max-width:90%;">
+    <h2 class="h1" style="margin-bottom:3vh;">💬 孩子可能会问的问题</h2>
+
+    <div class="split" style="grid-template-columns:1fr 1fr; gap:3vh;">
+      <div class="card" style="background:#FFF9E6; border-color:#FFD93D;">
+        <div class="h3" style="font-size:1.8vw; margin-bottom:1.5vh;">Q: [问题1]？</div>
+        <div class="body" style="font-size:1.5vw; line-height:1.7;">
+          A: [简单易懂的回答]
+        </div>
+        <div class="meta" style="margin-top:1vh;">延伸：[引导方向]</div>
+      </div>
+
+      <div class="card" style="background:#E8F8F5; border-color:#4ECDC4;">
+        <div class="h3" style="font-size:1.8vw; margin-bottom:1.5vh;">Q: [问题2]？</div>
+        <div class="body" style="font-size:1.5vw; line-height:1.7;">
+          A: [简单易懂的回答]
+        </div>
+        <div class="meta" style="margin-top:1vh;">延伸：[引导方向]</div>
+      </div>
+
+      <div class="card" style="background:#FFE5EC; border-color:#FF6B9D;">
+        <div class="h3" style="font-size:1.8vw; margin-bottom:1.5vh;">Q: [问题3]？</div>
+        <div class="body" style="font-size:1.5vw; line-height:1.7;">
+          A: [简单易懂的回答]
+        </div>
+        <div class="meta" style="margin-top:1vh;">延伸：[引导方向]</div>
+      </div>
+
+      <div class="card" style="background:#F5F0FF; border-color:#A29BFE;">
+        <div class="h3" style="font-size:1.8vw; margin-bottom:1.5vh;">Q: [问题4]？</div>
+        <div class="body" style="font-size:1.5vw; line-height:1.7;">
+          A: [简单易懂的回答]
+        </div>
+        <div class="meta" style="margin-top:1vh;">延伸：[引导方向]</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:3vh; background:#FFE5EC; border-color:#FF6B9D;">
+      <div class="h3">⚠️ 不建议深入讲解</div>
+      <div class="body" style="margin-top:1vh;">
+        [复杂的历史事件、敏感的政治话题、抽象的哲学概念]——保持简单愉快即可
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div>[景点名称]小探险家手册</div>
+    <div>08 / 09</div>
+  </div>
+</section>
+
+<!-- 安全提示页（实地研学必含） -->
+<section class="slide">
+  <div class="chrome">
+    <div class="left">🛡️ 安全小提示</div>
+    <div class="right">09 / 12</div>
+  </div>
+
+  <div class="fill col" style="padding-top:6vh; max-width:85%;">
+    <div class="emoji-huge" style="font-size:8vw;">⚠️🛡️</div>
+    <h2 class="h1" style="margin:3vh 0;">探险时要注意安全哦！</h2>
+
+    <div class="card" style="background:#FFE5EC; border-color:#FF6B9D; margin-top:3vh;">
+      <div class="h3" style="font-size:2vw; margin-bottom:2vh;">🦶 脚下安全</div>
+      <div class="body" style="font-size:1.8vw; line-height:1.8;">
+        <p>[根据景点定制：如长城类填写"注意台阶高低不平，走路要慢慢走"，山岳类填写"注意脚下湿滑，不攀爬未开放区域"]</p>
+      </div>
+    </div>
+
+    <div class="card" style="background:#FFF9E6; border-color:#FFD93D;">
+      <div class="h3" style="font-size:2vw; margin-bottom:2vh;">🚶 行走规则</div>
+      <div class="body" style="font-size:1.8vw; line-height:1.8;">
+        <p>[根据景点定制：如"不翻爬垛口/护栏"、"不擅自离开游览路线"、"不追逐打闹"]</p>
+      </div>
+    </div>
+
+    <div class="card" style="background:#E8F8F5; border-color:#4ECDC4;">
+      <div class="h3" style="font-size:2vw; margin-bottom:2vh;">👨‍👩‍👧‍👦 跟随家长</div>
+      <div class="body" style="font-size:1.8vw; line-height:1.8;">
+        <p>时刻和家长在一起，不独自跑到远处，看到有趣的东西先叫家长一起来看</p>
+      </div>
+    </div>
+
+    <div class="card" style="background:#F5F0FF; border-color:#A29BFE;">
+      <div class="h3" style="font-size:2vw; margin-bottom:2vh;">🌤️ 天气注意</div>
+      <div class="body" style="font-size:1.8vw; line-height:1.8;">
+        <p>[根据景点定制：如"晴天注意防晒"、"雨天路滑要小心"、"冬天注意保暖"]</p>
+      </div>
+    </div>
+
+    <div class="task-card" style="margin-top:3vh;">
+      <div class="h3" style="font-size:2vw;">🎯 安全小任务</div>
+      <div class="body" style="font-size:1.8vw; margin-top:1vh;">
+        找一找周围有哪些不安全的地方？指给家长看，避免靠近！
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div>[景点名称]小探险家手册</div>
+    <div>09 / 12</div>
+  </div>
+</section>
+
+<!-- 误区纠正页（10岁以上建议包含） -->
+<section class="slide">
+  <div class="chrome">
+    <div class="left">🤔 这是真的吗</div>
+    <div class="right">10 / 12</div>
+  </div>
+
+  <div class="fill col" style="padding-top:5vh; max-width:90%;">
+    <h2 class="h1" style="margin-bottom:3vh;">关于[景点名称]，<br>这些说法是真的吗？</h2>
+
+    <div class="card" style="background:#FFE5EC; border-color:#FF6B9D; margin-bottom:3vh;">
+      <div class="h3" style="font-size:1.8vw; margin-bottom:1.5vh;">🚫 误区一：[网络上常见的错误说法]</div>
+      <div class="body" style="font-size:1.6vw; line-height:1.7; margin-bottom:1vh;">
+        <strong>✅ 真相：</strong>[基于可靠事实的纠正，用孩子能理解的语言]
+      </div>
+      <div class="meta" style="font-size:1.4vw;">💡 为什么会有这个说法：[简单解释误说的来源]</div>
+    </div>
+
+    <div class="card" style="background:#FFF9E6; border-color:#FFD93D; margin-bottom:3vh;">
+      <div class="h3" style="font-size:1.8vw; margin-bottom:1.5vh;">🚫 误区二：[夸大或片面的说法]</div>
+      <div class="body" style="font-size:1.6vw; line-height:1.7; margin-bottom:1vh;">
+        <strong>✅ 真相：</strong>[更准确的表述，避免绝对化语言]
+      </div>
+      <div class="meta" style="font-size:1.4vw;">💡 小知识：[补充正确的背景信息]</div>
+    </div>
+
+    <div class="card" style="background:#E8F8F5; border-color:#4ECDC4;">
+      <div class="h3" style="font-size:1.8vw; margin-bottom:1.5vh;">🚫 误区三：[第三个常见误解]</div>
+      <div class="body" style="font-size:1.6vw; line-height:1.7; margin-bottom:1vh;">
+        <strong>✅ 真相：</strong>[基于权威来源的准确说法]
+      </div>
+      <div class="meta" style="font-size:1.4vw;">💡 记住这个：[帮助孩子记忆正确知识点的提示]</div>
+    </div>
+
+    <div class="tip-card" style="margin-top:3vh;">
+      <div class="h3" style="font-size:1.8vw;">🎯 小侦探任务</div>
+      <div class="body" style="font-size:1.6vw; margin-top:1vh;">
+        回家后，你可以和爸爸妈妈一起查查这些说法是从哪里来的。学会辨别真伪，也是一种探险能力哦！
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div>[景点名称]小探险家手册</div>
+    <div>10 / 12</div>
+  </div>
+</section>
+
+<!-- 涂色/手绘页（含票根粘贴区） -->
+<section class="slide center">
+  <div class="chrome">
+    <div class="left">🎨 创意时间</div>
+    <div class="right">14 / 16</div>
+  </div>
+
+  <div class="fill col" style="padding-top:5vh; max-width:90%;">
+    <h2 class="h1" style="margin-bottom:3vh;">画出你印象最深的东西！</h2>
+
+    <div class="card" style="background:#fff; border:3px dashed #FF6B9D; min-height:45vh; padding:4vh;">
+      <div class="h3" style="font-size:2vw; color:#FF6B9D; margin-bottom:2vh;">🖍️ 你的创作区</div>
+      <div class="body" style="font-size:1.6vw; color:#888;">
+        在这里画出今天看到的[景点特色]——可以是建筑、文物，或者你觉得有趣的任何东西！
+      </div>
+      <!-- 涂色区域留白 -->
+    </div>
+
+    <!-- 票根粘贴区 - 大幅加大空间 -->
+    <div class="card" style="background:#FFF9E6; border:3px dashed #FFD93D; min-height:22vh; padding:4vh; margin-top:4vh;">
+      <div class="h3" style="font-size:2vw; color:#FF6B9D; margin-bottom:2vh;">🎫 票根粘贴处</div>
+      <div class="body" style="font-size:1.6vw; color:#888;">
+        把今天的门票、车票贴在这里，留作纪念！
+      </div>
+      <!-- 票根粘贴区域留白 -->
+    </div>
+  </div>
+
+  <div class="foot">
+    <div>[景点名称]小探险家手册</div>
+    <div>14 / 16</div>
+  </div>
+</section>
+
+<!-- 总结页 -->
+<section class="slide center">
+  <div class="chrome">
+    <div class="left">🎓 探险完成</div>
+    <div class="right">11 / 12</div>
+  </div>
+
+  <div class="fill center col" style="padding-top:6vh;">
+    <div class="emoji-huge" style="font-size:8vw;">🎉</div>
+    <h1 class="display rainbow-text">探险完成啦！</h1>
+
+    <div class="col" style="margin-top:5vh; max-width:85%; gap:2.5vh;">
+      <div class="card" style="background:#FFF9E6; border-color:#FFD93D; padding:3vh 4vw;">
+        <div class="body" style="font-size:2vw; display:flex; align-items:center; gap:2vw;">
+          <span class="emoji-big">🌟</span>
+          <span>[核心记忆点1]</span>
+        </div>
+      </div>
+
+      <div class="card" style="background:#E8F8F5; border-color:#4ECDC4; padding:3vh 4vw;">
+        <div class="body" style="font-size:2vw; display:flex; align-items:center; gap:2vw;">
+          <span class="emoji-big">🌟</span>
+          <span>[核心记忆点2]</span>
+        </div>
+      </div>
+
+      <div class="card" style="background:#FFE5EC; border-color:#FF6B9D; padding:3vh 4vw;">
+        <div class="body" style="font-size:2vw; display:flex; align-items:center; gap:2vw;">
+          <span class="emoji-big">🌟</span>
+          <span>[核心记忆点3]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-card" style="margin-top:4vh; max-width:85%;">
+      <div class="h3" style="font-size:2vw;">🏠 回家问孩子</div>
+      <div class="body" style="font-size:1.8vw; margin-top:1vh;">
+        "[一个简单的总结问题]"
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div>[景点名称]小探险家手册</div>
+    <div>11 / 12</div>
+  </div>
+</section>
+
+</div>
+
+<div id="nav"></div>
+
+<script>
+(function(){
+  const deck = document.getElementById('deck');
+  const nav = document.getElementById('nav');
+  const slides = document.querySelectorAll('.slide');
+  let currentIndex = 0;
+  const totalSlides = slides.length;
+
+  for(let i = 0; i < totalSlides; i++){
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    nav.appendChild(dot);
+  }
+
+  function updateNav(){
+    const dots = nav.querySelectorAll('.dot');
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  function goToSlide(index){
+    if(index < 0) index = 0;
+    if(index >= totalSlides) index = totalSlides - 1;
+    currentIndex = index;
+    deck.style.transform = `translateX(-${currentIndex * 100}vw)`;
+    updateNav();
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' '){
+      e.preventDefault();
+      goToSlide(currentIndex + 1);
+    } else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){
+      e.preventDefault();
+      goToSlide(currentIndex - 1);
+    }
+  });
+
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, {passive: true});
+
+  document.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, {passive: true});
+
+  function handleSwipe(){
+    const diff = touchStartX - touchEndX;
+    if(Math.abs(diff) > 50){
+      if(diff > 0){
+        goToSlide(currentIndex + 1);
+      } else {
+        goToSlide(currentIndex - 1);
+      }
+    }
+  }
+
+  let scrollTimeout = null;
+  document.addEventListener('wheel', (e) => {
+    if(scrollTimeout) return;
+    scrollTimeout = setTimeout(() => {
+      scrollTimeout = null;
+    }, 1000);
+
+    if(e.deltaY > 0){
+      goToSlide(currentIndex + 1);
+    } else {
+      goToSlide(currentIndex - 1);
+    }
+  }, {passive: true});
+
+  goToSlide(0);
+})();
+</script>
+
+</body>
+</html>
