@@ -258,6 +258,106 @@ PPT思维：一个知识点 = 一个模块 = 一个盒子
 
 **适用**: IP故事、趣味讲解、互动游戏
 
+**HTML模板（V4.5新增，P0优先级）**：
+
+```html
+<!-- P8 漫画互动页完整结构 -->
+<div class="page tpl-comic">
+  <h2 class="page-title">🎭 小岱的封禅故事</h2>
+  
+  <!-- 漫画分镜容器：使用flex横向排列或grid布局 -->
+  <div class="comic-grid">
+    
+    <!-- 第1格 -->
+    <div class="comic-panel">
+      <img src="data:image/png;base64,..." alt="场景1">
+      <div class="comic-caption">
+        <strong>第一幕</strong><br>
+        秦始皇统一六国后，第一次来到泰山封禅
+      </div>
+    </div>
+    
+    <!-- 第2格 -->
+    <div class="comic-panel">
+      <img src="data:image/png;base64,..." alt="场景2">
+      <div class="comic-caption">
+        <strong>第二幕</strong><br>
+        他在山顶祭告天地，成为第一位封禅的皇帝
+      </div>
+    </div>
+    
+    <!-- 第3格 -->
+    <div class="comic-panel">
+      <img src="data:image/png;base64,..." alt="场景3">
+      <div class="comic-caption">
+        <strong>第三幕</strong><br>
+        汉武帝后来也来到泰山，他一生封禅了7次！
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- 互动区域 -->
+  <div class="interactive-box">
+    <h4>🤔 猜一猜</h4>
+    <p>哪位皇帝封禅次数最多？</p>
+    <p>□ 秦始皇&nbsp;&nbsp;□ 汉武帝&nbsp;&nbsp;□ 唐玄宗</p>
+  </div>
+  
+  <!-- IP出场 -->
+  <div class="ip-bubble corner-bottom-right">
+    🦌 小岱说：汉武帝真是太喜欢泰山了！
+  </div>
+</div>
+```
+
+**CSS规范**：
+
+```css
+/* 漫画网格布局 */
+.comic-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);  /* 3列 */
+  gap: 16px;
+  margin: 20px 0;
+}
+
+/* 单个漫画panel */
+.comic-panel {
+  border: 1.5px solid var(--sand-gold);
+  border-radius: 8px;
+  overflow: visible;
+  background: #FFF8E8;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+}
+
+.comic-panel img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.comic-caption {
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--ink-mid);
+  line-height: 1.6;
+  background: #FFF8E8;
+  border-top: 1px solid var(--sand-gold);
+}
+```
+
+**关键规则**：
+- ✅ 必须使用`.comic-grid`容器包裹所有panel
+- ✅ 每个panel必须是独立的`.comic-panel` div
+- ✅ 每个panel包含一个`<img>`和一个`.comic-caption`
+- ✅ 3-4个panel使用grid布局横向排列
+- ❌ 禁止将所有图片放在同一个panel里
+- ❌ 禁止缺少`.comic-grid`容器
+
 ---
 
 ### 模板7：测验页（V4.1优化，P0优先级）
@@ -1693,6 +1793,7 @@ P17: 家长指南（纯文字）
 | V4.3 | - | 手册改名、P17推荐阅读、删除"连一连" |
 | V4.4 | 2026-06 | 伪多Agent 5阶段、Phase 5强制检查清单、"为什么"解释、体验式互动 |
 | **V4.5** | 2026-06-23 | **AI生图强制调用规则、Phase 3.5配图规划、降级机制优化** |
+| **V4.5.1** | 2026-06-23 | **P8漫画页完整HTML模板、防止图片挤在一个格子** |
 
 **版式多样性**：
 - [ ] 使用了至少4种不同模板
